@@ -1,5 +1,5 @@
 import csv
-import ConfigParser
+import configparser
 import datetime
 import os, sys
 import zipfile
@@ -32,7 +32,7 @@ def read_student_list(file_name):
 
 
 def read_config_file(config_file):
-    config = ConfigParser.ConfigParser()
+    config = configparser.ConfigParser()
     config.read(config_file)
     config_data = {}
     config_data['course_e_mail'] = config.get('General','course_e_mail')
@@ -61,7 +61,7 @@ def read_config_file(config_file):
 
 def standartize_email(address):
     # remove '.' symbol and put to lower case
-    return address.translate(None, '.').lower()
+    return address.translate(address.maketrans("", "", ".")).lower()
 
 
 def search_student_by_email(student_list, address):
@@ -126,7 +126,7 @@ def extract_files_zip_archive(file_path, target_path, desired_files):
 def extract_files_rar_archive(file_path, target_path, desired_files):
     try:
         if not RAR_INSTALLED:
-            print 'rarfile module is not installed: cannot unpack', file_path
+            print('rarfile module is not installed: cannot unpack', file_path)
             return None
 
         read_files = []
@@ -153,7 +153,7 @@ def extract_cc_info(cur_mail):
 
 
 def react_email_unknown_sender(timestamp, cur_mail, config):
-    print timestamp, ':', 'Mail from unknown sender:', cur_mail['From']
+    print(timestamp, ':', 'Mail from unknown sender:', cur_mail['From'])
 
     emails_cc, cc_message = extract_cc_info(cur_mail)
 
@@ -165,7 +165,7 @@ def react_email_unknown_sender(timestamp, cur_mail, config):
                                                          failed_emails_path = config['failed_emails_path'] )
     if exit_message != 'OK':
         # error while sending the e-mail
-        print timestamp, ':', exit_message
+        print(timestamp, ':', exit_message)
     # send message to the teacher
     exit_message = gmail_communication.forward_email_gmail(config['course_e_mail'], config['course_e_mail_password'], config['teacher_email'],
                                                          cur_mail,
@@ -173,7 +173,7 @@ def react_email_unknown_sender(timestamp, cur_mail, config):
                                                          failed_emails_path = config['failed_emails_path'] )
     if exit_message != 'OK':
         # error while sending the e-mail
-        print timestamp, ':', exit_message
+        print(timestamp, ':', exit_message)
 
 
 def save_attachements(timestamp, cur_mail, submit_path, test_files):
@@ -193,13 +193,13 @@ def save_attachements(timestamp, cur_mail, submit_path, test_files):
 
         if len(attachment['file_name']) >= 4 and attachment['file_name'][-4:].lower() == '.zip':
             # found a ZIP archive, need to unpack
-            print timestamp, ':', 'Unpacking archive', attachment['file_name']
+            print(timestamp, ':', 'Unpacking archive', attachment['file_name'])
             extracted_files = extract_files_zip_archive(os.path.join(submit_path,attachment['file_name']), submit_path, test_files)
             is_archive = True
 
         if RAR_INSTALLED and len(attachment['file_name']) >= 4 and attachment['file_name'][-4:].lower() == '.rar':
             # found a RAR archive, need to unpack
-            print timestamp, ':', 'Unpacking archive', attachment['file_name']
+            print(timestamp, ':', 'Unpacking archive', attachment['file_name'])
             extracted_files = extract_files_rar_archive(os.path.join(submit_path,attachment['file_name']), submit_path, test_files)
             is_archive = True
 
@@ -229,7 +229,7 @@ def read_student_score_file(file_name, number_tests):
             cur_student_score['total_score'] = float(row[2])
             cur_student_score['late-penalty'] = float(row[3])
             test_scores = []
-            for i_task in xrange(number_tests):
+            for i_task in range(number_tests):
                 if row[i_task+4] == 'None':
                     test_scores.append(None)
                 else:
@@ -240,21 +240,21 @@ def read_student_score_file(file_name, number_tests):
 
 
 def write_student_score_file(file_name, number_tests, student_score_data):
-    with open(file_name, 'wb') as csvfile:
+    with open(file_name, 'w') as csvfile:
         writer = csv.writer(csvfile, delimiter=',',quotechar='|', quoting=csv.QUOTE_MINIMAL)
-        for i_student in xrange(len(student_score_data)):
+        for i_student in range(len(student_score_data)):
             cur_student_score = student_score_data[i_student]
             cur_list = [cur_student_score['email'], cur_student_score['time_stamp'], str(cur_student_score['total_score']), str(cur_student_score['late-penalty'])]
-            for i_test in xrange(number_tests):
+            for i_test in range(number_tests):
                 cur_list.append(str(cur_student_score['test_scores'][i_test]))
             writer.writerow(cur_list)
 
 
 def find_student_email(student_score_data, student):
     student_id = None
-    for i_email in xrange(len(student_score_data)):
+    for i_email in range(len(student_score_data)):
         email = student_score_data[i_email]['email']
-        for i in xrange(len(student['e-mails'])):
+        for i in range(len(student['e-mails'])):
             if standartize_email(student['e-mails'][i]) == standartize_email(email):
                 student_id = i_email
     return student_id
@@ -302,7 +302,7 @@ def check_solutions(config, submit_path, student, submission_time):
     old_test_scores, old_full_score = get_previous_scores(config, student)
     test_scores = [None]*config['number_tests']
     # start testing
-    for test_case in xrange(config['number_tests']):
+    for test_case in range(config['number_tests']):
         test_file = config['test_pattern']%(test_case+1)
         test_data_file = config['test_data_pattern']%(test_case+1)
         test_groundtruth_file = config['test_groundtruth_pattern']%(test_case+1)
@@ -315,6 +315,7 @@ def check_solutions(config, submit_path, student, submission_time):
             p = subprocess.Popen(command_line_checker,stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
             output, errors = p.communicate()
             # we assume that the score for this test file is given in the first line
+            output = output.decode("utf-8")
             first_line_ends = output.find('\n')
             first_line_elements = output[0:first_line_ends].split(' ')
             score = float(first_line_elements[0])
@@ -376,7 +377,7 @@ def check_solutions(config, submit_path, student, submission_time):
 
 
 def react_email(timestamp, cur_mail, config, student):
-    print timestamp, ':', 'E-mail from ', student['first_name'], student['last_name']
+    print(timestamp, ':', 'E-mail from ', student['first_name'], student['last_name'])
 
     student_path = os.path.join(config['solutions_path'], student['last_name']+'_'+student['first_name'] );
     create_path(student_path)
@@ -399,7 +400,7 @@ def react_email(timestamp, cur_mail, config, student):
                                                          failed_emails_path = config['failed_emails_path'] )
         if exit_message != 'OK':
             # error while sending the e-mail
-            print timestamp, ':', exit_message
+            print(timestamp, ':', exit_message)
     else:
         submit_message = ''
         test_files = [config['test_pattern']%(i+1) for i in range(config['number_tests'])] # names of all test files
@@ -424,7 +425,7 @@ def react_email(timestamp, cur_mail, config, student):
 
         if exit_message != 'OK':
             # error while sending the e-mail
-            print timestamp, ':', exit_message
+            print(timestamp, ':', exit_message)
 
 
 def server_email_check(config_file):
@@ -436,16 +437,16 @@ def server_email_check(config_file):
     exit_message, emails = gmail_communication.receive_emails_gmail( config['course_e_mail'], config['course_e_mail_password'], config['gmail_label'] )
     if exit_message != 'OK':
         # error while checking the g-mail folder
-        print timestamp, ':', exit_message
+        print(timestamp, ':', exit_message)
         return config['email_check_pause_minutes']
 
     if len(emails) == 0:
         # no e-mails received
         return config['email_check_pause_minutes']
 
-    print timestamp, ':', 'Received', len(emails), 'e-mails. Parsing...'
+    print(timestamp, ':', 'Received', len(emails), 'e-mails. Parsing...')
     for cur_mail in emails:
-        print timestamp, ':', 'Parsing e-mail from', cur_mail['From'], 'received at', cur_mail['Time']
+        print(timestamp, ':', 'Parsing e-mail from', cur_mail['From'], 'received at', cur_mail['Time'])
         # get sender name
         student = search_student_by_email(student_list, cur_mail['From'])
         if not student:
@@ -465,4 +466,4 @@ if __name__ == '__main__':
             time.sleep(email_check_pause_minutes*60.0)
             email_check_pause_minutes = server_email_check(config_file)
     else:
-        print 'Expecting 1 command line argument: config fiel name'
+        print('Expecting 1 command line argument: config fiel name')

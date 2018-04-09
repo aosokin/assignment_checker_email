@@ -21,12 +21,12 @@ MESSAGES_SCORE[MAX_SCORE] = lambda value, value_to_get : \
 
 VALUE_TESTS = {}
 # value for half mark, for the full mark, optimal value (can replaced with a place-holder)
-VALUE_TESTS['task3_test1.txt'.lower()] = [482,430,428.871756]
-VALUE_TESTS['task3_test2.txt'.lower()] = [23433,20800,20750.762504]
-VALUE_TESTS['task3_test3.txt'.lower()] = [35985,30000,29440.412221]
-VALUE_TESTS['task3_test4.txt'.lower()] = [40000,37600,36934]
-VALUE_TESTS['task3_test5.txt'.lower()] = [378069,323000,316527]
-VALUE_TESTS['task3_test6.txt'.lower()] = [78478868,67700000,66050619.79]
+VALUE_TESTS['tsp_test1.txt'.lower()] = [482,430,428.871756]
+VALUE_TESTS['tsp_test2.txt'.lower()] = [23433,20800,20750.762504]
+VALUE_TESTS['tsp_test3.txt'.lower()] = [35985,30000,29440.412221]
+VALUE_TESTS['tsp_test4.txt'.lower()] = [40000,37600,36934]
+VALUE_TESTS['tsp_test5.txt'.lower()] = [378069,323000,316527]
+VALUE_TESTS['tsp_test6.txt'.lower()] = [78478868,67700000,66050619.79]
 
 # the default weight for all the tests is 1.0
 TEST_WEIGHT = {}
@@ -84,7 +84,7 @@ def read_numbers(data_file):
     input_data = decode_lines(data_file)
 
     numbers = np.array([])
-    for i_line in xrange(len(input_data)):
+    for i_line in range(len(input_data)):
         entries = input_data[i_line].split()
         entries = filter(None, entries) # remove empty entries
         line_numbers = [ float(x) if x.lower != "inf" else float("inf") for x in entries ]
@@ -102,7 +102,7 @@ def read_data(data_file):
 
     # get data on the points
     points = np.zeros((num_points, 2))
-    for i_point in xrange(num_points):
+    for i_point in range(num_points):
         points[i_point, 0] = float(numbers[cur_entry])
         cur_entry += 1
         points[i_point, 1] = float(numbers[cur_entry])
@@ -120,7 +120,7 @@ def check_tsp_solution( solution, points ):
     visited_nodes = np.zeros(num_points, dtype=bool)
     path_length = dist( points[solution[0]], points[solution[-1]] )
     visited_nodes[solution[-1]] = True
-    for i_point in xrange(num_points-1):
+    for i_point in range(num_points-1):
         visited_nodes[solution[i_point]] = True
         path_length += dist( points[solution[i_point]], points[solution[i_point+1]] )
 
@@ -164,35 +164,35 @@ if __name__ == '__main__':
         try:
             tested_numbers = read_numbers(tested_file)
         except:
-            print 0.0
-            print 'Failed to read file', os.path.basename(tested_file)
+            print(0.0)
+            print('Failed to read file', os.path.basename(tested_file))
             sys.exit(0)
 
         correct_numbers = read_numbers(correct_file)
         points = read_data(test_file)
 
         if len(tested_numbers) != len(correct_numbers):
-            print 0.0
-            print 'Infeasible answer'
-            print 'Wrong number of entries in file %s'%(os.path.basename(tested_file)), '(%d instead of %d).'%(len(tested_numbers), len(correct_numbers))
+            print(0.0)
+            print('Infeasible answer')
+            print('Wrong number of entries in file %s'%(os.path.basename(tested_file)), '(%d instead of %d).'%(len(tested_numbers), len(correct_numbers)))
         else:
             is_correct = True
             submitted_value, feasibility_message = check_feasibility( tested_numbers, points )
             if submitted_value is None:
-                print 0.0
-                print feasibility_message,
+                print(0.0)
+                print(feasibility_message, end='')
             else:
                 test_name = os.path.basename(test_file)
                 score, value_to_improve = asign_score(submitted_value, test_name)
                 if score is not None:
                     if test_name.lower() in TEST_WEIGHT:
-                        print score * TEST_WEIGHT[test_name.lower()]
+                        print(score * TEST_WEIGHT[test_name.lower()])
                     else:
-                        print score
-                    print feasibility_message,
-                    print MESSAGES_SCORE[score](submitted_value, value_to_improve)
+                        print(score)
+                    print(feasibility_message, end='')
+                    print(MESSAGES_SCORE[score](submitted_value, value_to_improve))
                 else:
-                    print 0.0
-                    print 'Could not grade your solution for unknown reason. Please, contact the instructors to resolve this issue.'
+                    print(0.0)
+                    print('Could not grade your solution for unknown reason. Please, contact the instructors to resolve this issue.')
     else:
-        print 'Expecting 3 command line arguments: test_file, correct_answer, tested_answer'
+        print('Expecting 3 command line arguments: test_file, correct_answer, tested_answer')

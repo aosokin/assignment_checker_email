@@ -26,7 +26,7 @@ def read_numbers(data_file):
     input_data = decode_lines(data_file)
 
     numbers = np.array([])
-    for i_line in xrange(len(input_data)):
+    for i_line in range(len(input_data)):
         entries = input_data[i_line].split()
         entries = filter(None, entries) # remove empty entries
         line_numbers = [ float(x) if x.lower != "inf" else float("inf") for x in entries ]
@@ -50,22 +50,22 @@ if __name__ == '__main__':
 
 
         if len(tested_numbers) != len(correct_numbers):
-            print 0.0
-            print 'Wrong answer'
-            print 'Wrong number of entries in file ', os.path.basename(tested_numbers)
-            print 'Expected', len(correct_numbers)
+            print(0.0)
+            print('Wrong answer')
+            print('Wrong number of entries in file ', os.path.basename(tested_numbers))
+            print('Expected', len(correct_numbers))
         else:
             is_correct = True
-            for i in xrange(len(correct_numbers)):
+            for i in range(len(correct_numbers)):
                 if abs(tested_numbers[i] - correct_numbers[i]) > COMPARISON_ACCURACY:
-                    print 0.0
-                    print 'Wrong answer'
-                    print 'Value', tested_numbers[i], 'in position', i , 'is incorrect'
+                    print(0.0)
+                    print('Wrong answer')
+                    print('Value', tested_numbers[i], 'in position', i , 'is incorrect')
                     is_correct = False
                     break
 
         if is_correct:
-            print 1.0
-            print 'OK'
+            print(1.0)
+            print('OK')
     else:
-        print 'Expecting 3 command line arguments: test_file, correct_answer, tested_answer'
+        print('Expecting 3 command line arguments: test_file, correct_answer, tested_answer')

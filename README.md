@@ -5,7 +5,7 @@ Created by Anton Osokin.
 
 ### Description
 
-This system is a very basic script (Python 2.7) that runs on a server machine (the only requirement is Internet connection), checks e-mails, downloads solutions, checks and grades the solutions. The system currently does not run the code provided by students, but only checks solutions on the tests submitted in the text files.
+This system is a very basic script (Python 3.6) that runs on a server machine (the only requirement is Internet connection), checks e-mails, downloads solutions, checks and grades the solutions. The system currently does not run the code provided by students, but only checks solutions on the tests submitted in the text files.
 I used this system for assignments of the two types: get the unique correct answer and optimize a function as well as you can.
 
 Main properties of the system:
@@ -25,11 +25,16 @@ Main properties of the system:
 
 ### Installation
 
-The goal of writing these scripts was to make something very simple with almost no dependencies. As a result, the only requirement is a Python 2.7 distribution (I used Anaconda) with almost no extra packages.
+The goal of writing these scripts was to make something very simple with almost no dependencies. As a result, the only requirement is a Python 3.6 distribution (I used Anaconda) with almost no extra packages.
 
-0. Setup the course e-mail on [GMAIL](https://gmail.com), create a special label for the task, create a filter that puts e-mails with a subject marker given to students under this label, allow [less secure apps to access your account](https://support.google.com/accounts/answer/6010255?hl=en) (I do not recommend doing this on your main e-mail).
+0. Setup the course e-mail on [GMAIL](https://gmail.com), create a special label for the task, create a filter that puts e-mails with a subject marker given to students under this label, allow [less secure apps to access your account](https://support.google.com/accounts/answer/6010255?hl=en) (I do not recommend doing this on your main e-mail), make IMAP available in the GMAIl settings.
 
-1. Install [Anaconda 2](https://www.continuum.io/downloads) suitable for your system (I used Anaconda2-2.4.0-Linux-x86_64.sh). Install `chardet` package to deal with weird file encodings: `conda install -c anaconda chardet=2.3.0`. Optional: if you want to parse RAR archives (students like them) install package `rarfile`.
+1. Install [Anaconda](https://www.continuum.io/downloads) suitable for your system. Optional: if you want to parse RAR archives (students like them) install package `rarfile`.
+  ```Shell
+  conda create --name assignment_server python=3.6 chardet numpy
+  source activate assignment_server
+  conda install -c anjos rarfile
+  ```
 
 2. Get the scripts:  
   ```Shell

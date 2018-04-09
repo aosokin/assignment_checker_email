@@ -21,7 +21,7 @@ def connect_gmail( gmail_address, gmail_password ):
     imap_session = imaplib.IMAP4_SSL('imap.gmail.com')
     exit_code, account_details = imap_session.login(gmail_address,  gmail_password)
     if exit_code != 'OK':
-        print 'Cannot connect to', gmail_address
+        print('Cannot connect to', gmail_address)
         raise
     return imap_session
 
@@ -68,14 +68,14 @@ def receive_emails_gmail( gmail_address, gmail_password, gmail_label ):
         # typ, data = imap_session.search(None, 'ALL') # receive all e-mails
         exit_code, data = imap_session.search(None, '(UNSEEN)') # receive only unread e-mails
         if exit_code != 'OK':
-            print 'Error while searching e-mails from', gmail_address
+            print('Error while searching e-mails from', gmail_address)
             raise
 
         # Iterating over all emails
         for msgId in data[0].split():
             exit_code, message_parts = imap_session.fetch(msgId, '(RFC822)') # magic sequence
             if exit_code != 'OK':
-                print 'Error fetching mail from', gmail_address
+                print('Error fetching mail from', gmail_address)
                 raise
 
             # parsing the new e-mail
@@ -83,6 +83,7 @@ def receive_emails_gmail( gmail_address, gmail_password, gmail_label ):
 
             # get the whole mail in one object
             email_body = message_parts[0][1]
+            email_body = email_body.decode("utf-8")
             mail = email.message_from_string(email_body)
 
             # sender address
