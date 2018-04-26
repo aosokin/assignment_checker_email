@@ -312,6 +312,7 @@ def check_solutions(config, submit_path, student, submission_time):
         submit_message += 'Checking '+test_file+':\n'
         if os.path.exists(os.path.join(submit_path,test_file)):
             command_line_checker = config['checker_cmd']%(test_data_file, test_groundtruth_file, os.path.join(submit_path,test_file))
+            print(command_line_checker)
             p = subprocess.Popen(command_line_checker,stdout=subprocess.PIPE,stderr=subprocess.PIPE, shell=True)
             output, errors = p.communicate()
             # we assume that the score for this test file is given in the first line

@@ -30,7 +30,7 @@ VALUE_TESTS['tsp_test6.txt'.lower()] = [78478868,67700000,66050619.79]
 
 # the default weight for all the tests is 1.0
 TEST_WEIGHT = {}
-TEST_WEIGHT['task3_test6.txt'.lower()] = 2.0
+TEST_WEIGHT['tsp_test6.txt'.lower()] = 2.0
 
 MODE = 'min' # 'min' or 'max'
 
@@ -118,6 +118,7 @@ def dist(A, B):
 def check_tsp_solution( solution, points ):
     num_points = points.shape[0]
     visited_nodes = np.zeros(num_points, dtype=bool)
+    solution = solution.astype(int)
     path_length = dist( points[solution[0]], points[solution[-1]] )
     visited_nodes[solution[-1]] = True
     for i_point in range(num_points-1):
