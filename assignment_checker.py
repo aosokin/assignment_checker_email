@@ -414,7 +414,7 @@ def react_email(timestamp, cur_mail, config, student):
         else:
             submit_message += 'I could not find any test files in your solution. Please, ensure that files ' + ', '.join(test_files) + ' are attached in ZIP archive (.zip file).' + '\n'
 
-        submit_message += cc_message
+        # submit_message += cc_message
 
         exit_message = gmail_communication.reply_email_gmail(config['course_e_mail'], config['course_e_mail_password'],
                                                          cur_mail,
