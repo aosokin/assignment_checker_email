@@ -21,16 +21,16 @@ MESSAGES_SCORE[MAX_SCORE] = lambda value, value_to_get : \
 
 VALUE_TESTS = {}
 # value for half mark, for the full mark, optimal value (can replaced with a place-holder)
-VALUE_TESTS['tsp_test1.txt'.lower()] = [482,430,428.871756]
-VALUE_TESTS['tsp_test2.txt'.lower()] = [23433,20800,20750.762504]
-VALUE_TESTS['tsp_test3.txt'.lower()] = [35985,30000,29440.412221]
-VALUE_TESTS['tsp_test4.txt'.lower()] = [40000,37600,36934]
-VALUE_TESTS['tsp_test5.txt'.lower()] = [378069,323000,316527]
-VALUE_TESTS['tsp_test6.txt'.lower()] = [78478868,67700000,66050619.79]
+VALUE_TESTS['gc_test1.txt'.lower()] = [8,6,6]
+VALUE_TESTS['gc_test2.txt'.lower()] = [20,17,17]
+VALUE_TESTS['gc_test3.txt'.lower()] = [21,16,None]
+VALUE_TESTS['gc_test4.txt'.lower()] = [95,78,None]
+VALUE_TESTS['gc_test5.txt'.lower()] = [18,16,None]
+VALUE_TESTS['gc_test6.txt'.lower()] = [124,100,None]
 
 # the default weight for all the tests is 1.0
 TEST_WEIGHT = {}
-TEST_WEIGHT['tsp_test6.txt'.lower()] = 2.0
+TEST_WEIGHT['gc_test6.txt'.lower()] = 2.0
 
 MODE = 'min' # 'min' or 'max'
 
@@ -83,71 +83,89 @@ def decode_lines(data_file):
 def read_numbers(data_file):
     input_data = decode_lines(data_file)
 
-    numbers = np.array([])
+    num_read = 0
+    numbers = np.zeros(1000, dtype=int)
     for i_line in range(len(input_data)):
         entries = input_data[i_line].split()
         entries = filter(None, entries) # remove empty entries
-        line_numbers = [ float(x) if x.lower != "inf" else float("inf") for x in entries ]
-        numbers = np.append(numbers, line_numbers)
-    return numbers
+        line_numbers = [ int(float(x) + 0.5) if x.lower != "inf" else float("inf") for x in entries ]
+        line_numbers = np.array(line_numbers, dtype=numbers.dtype)
+        
+        if num_read + line_numbers.size > numbers.size:
+            # double the size of the buffer each time it is not enough
+            extra = numbers * 0
+            if numbers.size + extra.size < line_numbers.size + num_read:
+                extra = np.zeros(line_numbers.size + num_read - numbers.size, dtype=numbers.dtype)
+            numbers = np.append(numbers, extra)
+
+        numbers[num_read : num_read + line_numbers.size] = line_numbers
+        num_read += line_numbers.size
+
+    return numbers[:num_read]
 
 
 def read_data(data_file):
     numbers = read_numbers(data_file)
     cur_entry = 0
 
-    # number of points
-    num_points = int(numbers[cur_entry])
+    # number of solution_data
+    num_nodes = int(numbers[cur_entry])
+    cur_entry += 1
+    num_edges = int(numbers[cur_entry])
     cur_entry += 1
 
-    # get data on the points
-    points = np.zeros((num_points, 2))
-    for i_point in range(num_points):
-        points[i_point, 0] = float(numbers[cur_entry])
+    # get data on the solution_data
+    edges = np.zeros((num_edges, 2), dtype=int)
+    for i_edge in range(num_edges):
+        edges[i_edge, 0] = int(numbers[cur_entry] + 0.5)
         cur_entry += 1
-        points[i_point, 1] = float(numbers[cur_entry])
+        edges[i_edge, 1] = int(numbers[cur_entry] + 0.5)
         cur_entry += 1
 
-    return points
+    return num_nodes, num_edges, edges
 
 
-def dist(A, B):
-    return math.sqrt( (A[0] - B[0]) * (A[0] - B[0]) + (A[1] - B[1]) * (A[1] - B[1]) )
+def check_gc_solution( coloring, edges ):
+    used_colors = {}
+    num_colors = 0
+
+    for color in coloring:
+        if color not in used_colors:
+            used_colors[color] = 1
+            num_colors += 1
+
+    is_valid_solution = True
+    for i_node, j_node in edges:
+        if coloring[i_node] == coloring[j_node]:
+            is_valid_solution = False
+    
+    return is_valid_solution, num_colors
 
 
-def check_tsp_solution( solution, points ):
-    num_points = points.shape[0]
-    visited_nodes = np.zeros(num_points, dtype=bool)
-    solution = solution.astype(int)
-    path_length = dist( points[solution[0]], points[solution[-1]] )
-    visited_nodes[solution[-1]] = True
-    for i_point in range(num_points-1):
-        visited_nodes[solution[i_point]] = True
-        path_length += dist( points[solution[i_point]], points[solution[i_point+1]] )
-
-    is_valid_solution = not (False in visited_nodes)
-    return is_valid_solution, path_length
-
-
-def check_feasibility( submitted_solution, points ):
-    n = points.shape[0]
-    submitted_value = submitted_solution[0]
+def check_feasibility( submitted_solution, num_nodes, num_edges, edges ):
+    num_colors_submitted = submitted_solution[0]
     message = ''
 
-    for i_point in range(n):
-        cur_item = submitted_solution[i_point + 1]
-        if not are_equal_floats(cur_item, round(cur_item)) or round(cur_item) < 0 or round(cur_item) > n-1:
-            message += 'Value %f corresponding to item %d is not valid.'%(cur_item, i_item)
-            message += ' Expecting integer between 0 and %d.\n'%(n-1)
-            return None, message
-
-    is_valid_solution, computed_value = check_tsp_solution(  submitted_solution[1:], points )
-    if not is_valid_solution:
-        message += 'The submitted solution is not a valid TSP path.\n'
+    coloring = submitted_solution[1:]
+    n = coloring.shape[0]
+    if n != num_nodes:
+        message += 'The submitted coloring has wrong number of nodes: %d instead of %d.'%(n, num_nodes)
         return None, message
 
-    if not are_equal_floats(computed_value, submitted_value):
-        message += 'The value of the solution is computed incorrectly: %d instead of %d.'%(submitted_value, computed_value)
+    for i_node in range(n):
+        cur_item = coloring[i_node]
+        if not are_equal_floats(cur_item, round(cur_item)) or round(cur_item) < 0 or round(cur_item) > num_colors_submitted:
+            message += 'Value %f corresponding to node %d is not valid.'%(cur_item, i_node)
+            message += ' Expecting integer between 0 and the number of colors - 1 = %d.\n'%(num_colors_submitted - 1)
+            return None, message
+
+    is_valid_solution, computed_value = check_gc_solution( coloring, edges )
+    if not is_valid_solution:
+        message += 'The submitted solution is not a valid GC configuration.\n'
+        return None, message
+
+    if not are_equal_floats(computed_value, num_colors_submitted):
+        message += 'The value of the solution is computed incorrectly: %d instead of %d.'%(num_colors_submitted, computed_value)
         message += ' Using correct value %d.\n'%(computed_value)
     else:
         message += 'The produced configuration is feasible and the objective value is correct.\n'
@@ -170,7 +188,7 @@ if __name__ == '__main__':
             sys.exit(0)
 
         correct_numbers = read_numbers(correct_file)
-        points = read_data(test_file)
+        num_nodes, num_edges, edges = read_data(test_file)
 
         if len(tested_numbers) != len(correct_numbers):
             print(0.0)
@@ -178,7 +196,7 @@ if __name__ == '__main__':
             print('Wrong number of entries in file %s'%(os.path.basename(tested_file)), '(%d instead of %d).'%(len(tested_numbers), len(correct_numbers)))
         else:
             is_correct = True
-            submitted_value, feasibility_message = check_feasibility( tested_numbers, points )
+            submitted_value, feasibility_message = check_feasibility( tested_numbers, num_nodes, num_edges, edges )
             if submitted_value is None:
                 print(0.0)
                 print(feasibility_message, end='')

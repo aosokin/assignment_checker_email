@@ -263,7 +263,7 @@ def find_student_email(student_score_data, student):
 def update_student_scores(config, student, new_score_data):
     student_score_data = read_student_score_file(config['student_score_file'], config['number_tests'])
     student_id = find_student_email(student_score_data, student)
-    if not student_id is None:
+    if student_id is not None:
         student_score_data[student_id] = new_score_data
     else:
         student_score_data.append(new_score_data)
@@ -322,7 +322,7 @@ def check_solutions(config, submit_path, student, submission_time):
             score = float(first_line_elements[0])
             submit_message += output[first_line_ends+1:]
 
-            if not old_test_scores[test_case] is None:
+            if old_test_scores[test_case] is not None:
                 # there was some solution in the past
                 if score > old_test_scores[test_case]:
                     submit_message += 'Your new score is '+str(score)+' (instead of '+str(old_test_scores[test_case])+')\n'
@@ -338,6 +338,15 @@ def check_solutions(config, submit_path, student, submission_time):
             solution_score += score
         else:
             submit_message += 'File ' + test_file + ' not found in the submission\n'
+            
+            if old_test_scores[test_case] is not None:
+                # there was some solution in the past
+                score = old_test_scores[test_case]
+                submit_message += 'Your score '+str(score)+' comes from before\n'
+                test_scores[test_case] = score
+                solution_score += score
+            else:
+                submit_message += "You've never submitted this test, so the score is zero\n"
 
     # grade the solution
     delay_days = get_delay_days(submission_time, config['deadline'])
