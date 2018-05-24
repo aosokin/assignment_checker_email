@@ -125,8 +125,13 @@ def check_tsp_solution( solution, points ):
         visited_nodes[solution[i_point]] = True
         path_length += dist( points[solution[i_point]], points[solution[i_point+1]] )
 
+    message = ''
+    for i_node, flag in enumerate(visited_nodes):
+        if not flag:
+            message += 'Node %d is not visited\n'%(i_node)
+
     is_valid_solution = not (False in visited_nodes)
-    return is_valid_solution, path_length
+    return is_valid_solution, path_length, message
 
 
 def check_feasibility( submitted_solution, points ):
@@ -141,9 +146,9 @@ def check_feasibility( submitted_solution, points ):
             message += ' Expecting integer between 0 and %d.\n'%(n-1)
             return None, message
 
-    is_valid_solution, computed_value = check_tsp_solution(  submitted_solution[1:], points )
+    is_valid_solution, computed_value, test_message  = check_tsp_solution(  submitted_solution[1:], points )
     if not is_valid_solution:
-        message += 'The submitted solution is not a valid TSP path.\n'
+        message += 'The submitted solution is not a valid TSP path:\n' + test_message
         return None, message
 
     if not are_equal_floats(computed_value, submitted_value):

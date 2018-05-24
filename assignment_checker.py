@@ -352,7 +352,7 @@ def check_solutions(config, submit_path, student, submission_time):
     delay_days = get_delay_days(submission_time, config['deadline'])
     if delay_days >= 1:
         late_penalty = get_delay_penalty(delay_days, config)
-        submit_message += '\n' + 'You submitted this solution '+str(delay_days)+' days after the deadline. You are getting '+str(late_penalty)+' penalty for that.'+'\n'
+        submit_message += '\n' + 'You submitted this solution {0:d} days after the deadline. You are getting {1:.2f} penalty for that.\n'.format(delay_days, late_penalty)
     else:
         late_penalty = 0
 

@@ -134,12 +134,14 @@ def check_gc_solution( coloring, edges ):
             used_colors[color] = 1
             num_colors += 1
 
+    message = ''
     is_valid_solution = True
     for i_node, j_node in edges:
         if coloring[i_node] == coloring[j_node]:
             is_valid_solution = False
+            message += 'Vertices of the edge (%d, %d) are colored into %d\n'%(i_node, j_node, coloring[i_node])
     
-    return is_valid_solution, num_colors
+    return is_valid_solution, num_colors, message
 
 
 def check_feasibility( submitted_solution, num_nodes, num_edges, edges ):
@@ -159,9 +161,9 @@ def check_feasibility( submitted_solution, num_nodes, num_edges, edges ):
             message += ' Expecting integer between 0 and the number of colors - 1 = %d.\n'%(num_colors_submitted - 1)
             return None, message
 
-    is_valid_solution, computed_value = check_gc_solution( coloring, edges )
+    is_valid_solution, computed_value, test_message = check_gc_solution( coloring, edges )
     if not is_valid_solution:
-        message += 'The submitted solution is not a valid GC configuration.\n'
+        message += 'The submitted solution is not a valid GC configuration:\n' + test_message
         return None, message
 
     if not are_equal_floats(computed_value, num_colors_submitted):
