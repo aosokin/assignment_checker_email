@@ -358,7 +358,7 @@ def check_solutions(config, submit_path, student, submission_time):
 
     if not old_full_score is None and solution_score-late_penalty < old_full_score:
         # score is worse than the previous attempt
-        submit_message += '\n' + 'Your score '+str(solution_score)+' is worse than you previous score. I am keeping your old score '+str(old_full_score)+'.'+'\n'
+        submit_message += '\n' + 'Your score '+str(solution_score - late_penalty)+' is worse than you previous score. I am keeping your old score '+str(old_full_score)+'.'+'\n'
         full_score = old_full_score
     elif solution_score < config['acceptance_threshold']:
         submit_message += '\n' + 'Your score '+str(solution_score)+' is too low (below threshold '+str(config['acceptance_threshold'])+').'
