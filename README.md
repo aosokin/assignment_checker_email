@@ -82,11 +82,11 @@ student.email@gmail.com,timestamp,full_score,delay_penalty,test1_score,test2_sco
 A critical component the the system is a checker to actually check solutions submitted by students.
 I've used the system for the assignments of two types: correct answer is exact and unique, a task is an optimization problem and a solution is graded based on the achieved objective (and feasibility, of course).
 
-1. For the exact match tasks, script `checker_exact_match.py` should do fine. The test data file can replaced by a placeholder. the only internal parameter `COMPARISON_ACCURACY` sets the comparison accuracy.
+1. For the exact match tasks, script `checkers/checker_exact_match.py` should do fine. The test data file can replaced by a placeholder. the only internal parameter `COMPARISON_ACCURACY` sets the comparison accuracy.
 
-2. For the optimization tasks, you'll need to code a bit. In particular, you'll need to implement the computation of the function value. As examples, see script `checker_optimization_knapsack.py` for a task on the knapsack problem and `checker_optimization_tsp.py` for a task on TSP.
+2. For the optimization tasks, you'll need to code a bit. In particular, you'll need to implement the computation of the function value. As examples, see script `checkers/checker_optimization_knapsack.py` for a task on the knapsack problem and `checkers/checker_optimization_tsp.py` for a task on TSP.
 
-3. For measuring BLEU, please check out `checker_bleu.sh`. If you want to use public/private data splits, please see `task_bleu_checker.cfg` for examples of how to set this up.
+3. For measuring BLEU, please check out `checkers/checker_bleu.sh`. If you want to use public/private data splits, please see `task_bleu_checker.cfg` for examples of how to set this up.
 
 ### License
 
