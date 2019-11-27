@@ -27,7 +27,7 @@ Main properties of the system:
 
 The goal of writing these scripts was to make something very simple with almost no dependencies. As a result, the only requirement is a Python 3.7 distribution (I used Anaconda) with almost no extra packages.
 
-0. Setup the course e-mail on [GMAIL](https://gmail.com), create a special label for the task, create a filter that puts e-mails with a subject marker given to students under this label, allow [less secure apps to access your account](https://support.google.com/accounts/answer/6010255?hl=en) (I do not recommend doing this on your main e-mail), make IMAP available in the GMAIl settings.
+0. Setup the course e-mail on [GMAIL](https://gmail.com), create a special label for the task, create a filter that puts e-mails with a subject marker given to students under this label, allow [less secure apps to access your account](https://support.google.com/accounts/answer/6010255?hl=en) (I do not recommend doing this on your main e-mail), make IMAP available in the GMAIL settings.
 
 1. Install [Anaconda](https://www.continuum.io/downloads) suitable for your system. Optional: if you want to parse RAR archives (students like them) install package `rarfile`.
   ```Shell
