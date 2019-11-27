@@ -57,63 +57,24 @@ The goal of writing these scripts was to make something very simple with almost 
 
 ### Configuration files
 
-The main configuration file contains all information about the assignment. See the `task.cfg` for an example. Lines starting with `#` contain comments.
-
-```
-[General]
-# e-mail for the course
-course_e_mail=course.email@gmail.com
-# password to access gmail
-course_e_mail_password=course.email.password
-# file with the list of all students, created manually, can be shared among multiple tasks, see student_list.csv for an example
-student_list_file=student_list.csv
-# file to store grades, created automatically, one per each task
-student_score_file=taskX_scores.csv
-# e-mail where to write in case of unregistered students and some problems
-teacher_email=teacher@gmail.com
-# delay between the two e-mail checks, not to overload the connection
-email_check_pause_minutes=10
-[Assignment]
-# gmail label to store the e-mails parsed by the system
-gmail_label=TaskX 
-# name of the task used in communication with students
-task_name=Task X 
-# path to store student solutions, contains everything students send
-solutions_path=./taskX_student_solutions
-# number of tests for the assignment
-number_tests=5
-#pattern for the names of the test solutions, %%d - the index of a test (1-based)
-test_pattern=task_test%%d_solution.txt
-# command to launch the checker; has to contain %%s three times for the three file names: test data file, teacher-provided answer, student answer; not all the three files have to be actually read
-checker_cmd=python ./checker_exact_match.py "%%s" "%%s" "%%s"
-# pattern for files containing test data
-test_data_pattern=./data/taskX_test%%d.txt
-# pattern for files containing teacher-provided answer
-test_groundtruth_pattern=./data/taskX_test%%d_solution.txt
-# folder to store e-mails, if sending failed (just in case)
-failed_emails_path=taskX_unsent_emails
-# the assignment deadline: Year-Mon-Date-Hours:Min:Sec
-deadline=2016-05-13-23:59:59
-# grade penalty for each day of delay after the deadline
-delay_day_penalty=0.1
-# maximum allowed delay penalty
-delay_cap=5.0
-# score threshold to accept the assignment
-acceptance_threshold=1.0
-# score for non-accepted solution
-score_non_accepted=-5.0
-# maximum score per all the tests, used in communication with students, should be sum of the scores for all the tests
-max_score=5.0
-```
+The main configuration file contains all information about the assignment. See the `task.cfg` for an example of an optimization task and `task_bleu_checker.cfg` for an example of using BLEU, public/private data and leaderboard.
 
 Format for `student_list_file`(each line corresponds to one student, each student can have multiple e-mails, the first e-mail is the primary identifier): 
 ```
-student_last_name,student_first_name,student.main.email@gmail.com,student.email2@gmail.com,student.email3@gmail.com,...
+student_last_name,student_first_name,Student,student.main.email@gmail.com,student.email2@gmail.com,student.email3@gmail.com,...
 ```
 
 Format for `student_score_file` (each line corresponds to one student, number of tests can vary): 
 ```
 student.email@gmail.com,timestamp,full_score,delay_penalty,test1_score,test2_score,test3_score,test4_score,test5_score,test6_score,...
+```
+If using the leaderboard:
+```
+student.email@gmail.com,timestamp,full_score,delay_penalty,test1_score,test2_score,...,test1_leaderboard_score,test2_leaderboard_score,...
+```
+If using public/private data on top:
+```
+student.email@gmail.com,timestamp,full_score,delay_penalty,test1_score,test2_score,...,test1_leaderboard_public_score,test2_leaderboard_public_score,...,test1_leaderboard_private_score,test2_leaderboard_private_score,...
 ```
 
 ### Assignment checkers
@@ -125,6 +86,7 @@ I've used the system for the assignments of two types: correct answer is exact a
 
 2. For the optimization tasks, you'll need to code a bit. In particular, you'll need to implement the computation of the function value. As examples, see script `checker_optimization_knapsack.py` for a task on the knapsack problem and `checker_optimization_tsp.py` for a task on TSP.
 
+3. For measuring BLEU, please check out `checker_bleu.sh`. If you want to use public/private data splits, please see `task_bleu_checker.cfg` for examples of how to set this up.
 
 ### License
 
